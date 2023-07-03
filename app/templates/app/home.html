@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    /* 사이드바 스타일 */
+    .sidebar {
+      position: fixed;
+      left: -200px;
+      top: 0;
+      width: 200px;
+      height: 100vh;
+      background-color: #f1f1f1;
+      transition: left 0.5s ease;
+    }
+    .show-sidebar {
+      left: 0;
+    }
+    .toggle-button {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      cursor: pointer;
+      font-size: 24px;
+      z-index: 999;
+      transition: left 0.5s ease;
+    }
+    .show-sidebar .toggle-button {
+      left: 210px;
+      transition: left 0.5s ease;
+    }
+    .folder {
+      cursor: pointer;
+    }
+    .folder ul {
+      display: none;
+      padding-left: 10px;
+    }
+    .folder.open ul {
+      display: block;
+    }
+    .file {
+      margin-left: 10px;
+    }
+    .add-file-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 18px;
+      background-color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    .form-container {
+      margin-left: 0; /* 수정된 부분 */
+      padding: 20px;
+      transition: margin-left 0.5s ease; /* 추가된 부분 */
+    }
+    .form-container.sidebar-open {
+      margin-left: 200px; /* 추가된 부분 */
+    }
+    .form-container label {
+      display: block;
+      margin-bottom: 10px;
+    }
+    .form-container textarea {
+      width: 100%;
+      height: 100px;
+      margin-bottom: 10px;
+    }
+    .form-container button {
+      padding: 10px;
+    }
+    .form-template {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="toggle-button" id="toggleButton" onclick="toggleSidebar()">&#9776;</div>
+  <div class="sidebar" id="sidebar">
+    <ul id="fileExplorer">
+        <br>
+        <br>
+        <li class="folder" onclick="toggleFolder(this)">
+            Folder 1
+            <ul>
+              <li class="file">File 1</li>
+              <li class="file">File 2</li>
+            </ul>
+          </li>
+    </ul>
+    <button class="add-file-button" onclick="showFormTemplate()">+</button>
+  </div>
+  <div class="form-container" id="formContainer"></div>
+  <template class="form-template">
+    <div class="form-container">
+      <h2>New Article</h2>
+      <label for="title">Title:</label>
+      <input type="text" id="title" name="title" required>
+      <label for="writer">Author:</label>
+      <input type="text" id="writer" name="writer" required>
+      <label for="summary">Summary:</label>
+      <textarea id="summary" name="summary" required></textarea>
+      <label for="content">Content:</label>
+      <textarea id="content" name="content" required></textarea>
+      <label for="conclusion">Conclusion:</label>
+      <textarea id="conclusion" name="conclusion" required></textarea>
+      <label for="concepts">Key Concepts:</label>
+      <textarea id="concepts" name="concepts" required></textarea>
+      <button onclick="createArticle()">Create Article</button>
+    </div>
+  </template>
+  <script>
+    function createArticle(){
+        let title = document.getElementById("title").value;
+        let writer = document.getElementById("writer").value;
+        let summary = document.getElementById("summary").value;
+        let content = document.getElementById("content").value;
+        let conclusion = document.getElementById("conclusion").value;
+        let concepts = document.getElementById("concepts").value;
+        let data = {
+            "title" : title,
+            "writer" : writer,
+            "summary" : summary,
+            "content" : content,
+            "conclusion" : conclusion,
+            "concepts" : concepts};
+        const ajax = fetch("/article",{
+            method : "POST",
+            headers : {
+                "X-CSRFToken": '{{csrf_token}}',
+              'Content-Type':'application/json',
+            },
+            body : JSON.stringify(data)
+        } ).then(console.log("저장완료"))
+        
+    }
+    function toggleFolder(folder) {
+      folder.classList.toggle("open");
+    }
+
+function toggleSidebar() {
+  var sidebar = document.getElementById("sidebar");
+  var formContainer = document.getElementById("formContainer");
+
+  sidebar.classList.toggle("show-sidebar");
+  formContainer.classList.toggle("sidebar-open"); /* 추가된 부분 */
+  
+  var toggleButton = document.getElementById("toggleButton");
+  toggleButton.classList.toggle("show-sidebar");
+}
+
+function showFormTemplate() {
+  var formContainer = document.getElementById("formContainer");
+  var formTemplate = document.querySelector(".form-template");
+  if (formTemplate) {
+    var newForm = formTemplate.content.cloneNode(true);
+    formContainer.innerHTML = "";
+    formContainer.appendChild(newForm);
+  }
+}
+
+  </script>
+</body>
+</html>
